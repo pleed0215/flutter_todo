@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todo/components/todo_list.dart';
 import 'package:flutter_todo/todo.dart';
 import 'package:sqflite/sqlite_api.dart';
 
@@ -14,10 +15,16 @@ class DatabaseApp extends StatefulWidget {
 class _DatabaseAppState extends State<DatabaseApp> {
   Future<List<Todo>>? todoList;
 
-  void _insertTodo(Todo todo) async {
+  void insertTodo(Todo todo) async {
     final Database database = await widget.db;
-    await database.insert('todos', todo.toMap(),
+    int id = await database.insert('todos', todo.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace);
+    var list = await todoList;
+    Todo result = todo;
+    result.id = id;
+    setState(() {
+      list?.add(result);
+    });
   }
 
   Future<List<Todo>> getTodos() async {
@@ -40,6 +47,29 @@ class _DatabaseAppState extends State<DatabaseApp> {
     }
   }
 
+  void updateTodo(Todo todo) async {
+    final Database db = await widget.db;
+    await db
+        .update('todos', todo.toMap(), where: 'id = ?', whereArgs: [todo.id]);
+    var list = await todoList;
+    setState(() {
+      int index = list!.indexWhere((t) => t.id == todo.id);
+      if (index != -1) {
+        list[index] = todo;
+      }
+    });
+  }
+
+  void deleteTodo(Todo todo) async {
+    final Database db = await widget.db;
+    await db.delete('todos', where: 'id = ?', whereArgs: [todo.id]);
+    var list = await todoList;
+    setState(() {
+      int index = list!.indexWhere((t) => t.id == todo.id);
+      list.removeAt(index);
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -49,26 +79,29 @@ class _DatabaseAppState extends State<DatabaseApp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Database Example')),
+      appBar: AppBar(
+        title: const Text('Database Example'),
+        actions: [
+          TextButton(
+              onPressed: () async {
+                await Navigator.of(context).pushNamed('/clear');
+                setState(() {
+                  todoList = getTodos();
+                });
+              },
+              child: const Text('완료한 일', style: TextStyle(color: Colors.white)))
+        ],
+      ),
       body: Center(
           child: FutureBuilder(
               builder: (context, snapshot) {
                 switch (snapshot.connectionState) {
                   case ConnectionState.done:
                     if (snapshot.hasData) {
-                      return ListView.builder(
-                          itemBuilder: (context, index) {
-                            Todo todo = (snapshot.data as List<Todo>)[index];
-                            return Card(
-                                child: Column(
-                              children: [
-                                Text(todo.title!),
-                                Text(todo.content!),
-                                Text(todo.active == 1 ? 'true' : 'false'),
-                              ],
-                            ));
-                          },
-                          itemCount: (snapshot.data as List<Todo>).length);
+                      return TodoListComponent(
+                          list: snapshot.data as List<Todo>,
+                          deleteTodo: deleteTodo,
+                          updateTodo: updateTodo);
                     } else {
                       return const Text('No data');
                     }
@@ -84,7 +117,7 @@ class _DatabaseAppState extends State<DatabaseApp> {
           onPressed: () async {
             final todo = await Navigator.of(context).pushNamed('/add');
             if (todo != null) {
-              _insertTodo(todo as Todo);
+              insertTodo(todo as Todo);
             }
           },
           child: const Icon(Icons.add)),

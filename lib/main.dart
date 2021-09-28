@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_todo/add_todo.dart';
+import 'package:flutter_todo/clear_todo.dart';
 import 'package:flutter_todo/database_app.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -42,7 +43,8 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context)=>DatabaseApp(db: db),
-        '/add': (context)=>AddTodoPage(db: db)
+        '/add': (context)=>AddTodoPage(db: db),
+        '/clear': (context)=>ClearedPage(db:db)
       }
     );
   }
