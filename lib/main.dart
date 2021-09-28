@@ -1,10 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_todo/add_todo.dart';
-import 'package:flutter_todo/clear_todo.dart';
-import 'package:flutter_todo/database_app.dart';
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:sqflite/sqlite_api.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,39 +7,37 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  Future<Database> initDatabase() async {
-    return openDatabase(join(await getDatabasesPath(), 'todo_database.sliqte'),
-        onCreate: (db, version) {
-      return db.execute(
-          "CREATE TABLE IF NOT EXISTS todos(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, content TEXT, active INTEGER)");
-    }, version: 1);
-  }
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    Future<Database> db = initDatabase();
-
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      initialRoute: '/',
-      routes: {
-        '/': (context)=>DatabaseApp(db: db),
-        '/add': (context)=>AddTodoPage(db: db),
-        '/clear': (context)=>ClearedPage(db:db)
-      }
-    );
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          // This is the theme of your application.
+          //
+          // Try running your application with "flutter run". You'll see the
+          // application has a blue toolbar. Then, without quitting the app, try
+          // changing the primarySwatch below to Colors.green and then invoke
+          // "hot reload" (press "r" in the console where you ran "flutter run",
+          // or simply save your changes to "hot reload" in a Flutter IDE).
+          // Notice that the counter didn't reset back to zero; the application
+          // is not restarted.
+          primarySwatch: Colors.blue,
+        ),
+        home: const AnimationApp());
+  }
+}
+
+class AnimationApp extends StatefulWidget {
+  const AnimationApp({Key? key}) : super(key: key);
+
+  @override
+  _AnimationAppState createState() => _AnimationAppState();
+}
+
+class _AnimationAppState extends State<AnimationApp> {
+  @override
+  Widget build(BuildContext context) {
+    return Container();
   }
 }
