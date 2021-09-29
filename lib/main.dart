@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_todo/people.dart';
+import 'package:flutter_todo/second_page.dart';
+import 'package:flutter_todo/sliver_page.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -109,7 +112,22 @@ class _AnimationAppState extends State<AnimationApp> {
                       }
                     });
                   },
-                  child: const Text("이전"))
+                  child: const Text("이전")),
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const SecondPage()));
+                  },
+                  child: SizedBox(
+                      width: 200,
+                      child: Row(
+                        children: const [
+                          Hero(tag: 'detail', child: Icon(Icons.cake))
+                        ],
+                      ))),
+              ElevatedButton(onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(builder: (context)=> const SliverPage()));
+              }, child: const Text("To Sliver Page"))
             ],
             mainAxisAlignment: MainAxisAlignment.center,
           ),
